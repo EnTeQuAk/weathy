@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -94,6 +95,11 @@ func extractWeatherInfo(data []byte) string {
 }
 
 func main() {
-	lat, lng := getGeoCode("Berlin, Germany")
+	var city string
+
+	flag.StringVar(&city, "city", "Berlin, Germany", "City for Forecast")
+	flag.Parse()
+
+	lat, lng := getGeoCode(city)
 	fmt.Println(getWeatherInfo(lat, lng))
 }
