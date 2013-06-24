@@ -56,7 +56,13 @@ func getGeoCode(city string) (float64, float64) {
 
 func getWeatherInfo(lat float64, lng float64) string {
 	apiKey := os.Getenv("FORECAST_API_KEY")
+	if apiKey == "" {
+		log.Fatal("Please define FORECAST_API_KEY")
+		os.Exit(1)
+	}
 	requestUrl := fmt.Sprintf(FORECAST_API, apiKey, lat, lng)
+
+	log.Print(fmt.Sprintf("Fetch %s", requestUrl))
 
 	response, err := http.Get(requestUrl)
 
@@ -78,11 +84,23 @@ func getWeatherInfo(lat float64, lng float64) string {
 }
 
 func extractLatLngFromResponse(data []byte) (float64, float64) {
-	res := make(map[string][]map[string]map[string]map[string]interface{}, 0)
-	json.Unmarshal(data, &res)
+	type Location struct {
+		Lat float64
+		Lng float64
+	}
 
-	lat, _ := res["results"][0]["geometry"]["location"]["lat"].(float64)
-	lng, _ := res["results"][0]["geometry"]["location"]["lng"].(float64)
+	type Response struct {
+		Results []struct {
+			Geometry struct {
+				Location Location
+			}
+		}
+	}
+
+	var resp Response
+	json.Unmarshal(data, &resp)
+	lat := resp.Results[0].Geometry.Location.Lat
+	lng := resp.Results[0].Geometry.Location.Lng
 
 	return lat, lng
 }
