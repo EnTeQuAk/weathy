@@ -118,7 +118,7 @@ func extractWeatherInfo(data []byte) string {
 func main() {
 	var city string
 
-	flag.StringVar(&city, "city", "Berlin, Germany", "City for Forecast")
+	flag.StringVar(&city, "city", "Berlin", "City for Forecast")
 	flag.Parse()
 
 	lat, lng := getGeoCode(city)
